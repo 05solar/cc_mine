@@ -1,0 +1,133 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    align-items: baseline;
+    position: relative;
+    background: #a0a0a0;
+}
+/*버튼*/
+button {
+    border: 0;
+    background-color: transparent;
+    display: flex;
+}
+/*버튼 호버*/
+button:hover {
+    background-color: hsla(0, 0%, 37%, 0.274);
+}
+/*아이콘 크기*/
+.iconimg {
+    width: 18px;
+    height: 18px;
+}
+
+/* 상단 바 */
+header {
+    position: relative;
+    display:flex;
+    width:auto;
+    align-items: center;
+    text-align: center;
+}
+/*상단 검색창*/
+.search {
+    display: flex;
+    margin-right: auto;
+    padding: 5px;
+    width: 230px;
+    text-align: left;
+    border: 2px solid #aaaaaa;
+    border-radius: 20px;
+    box-shadow:inset 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+/*상단 검색창 글씨*/
+.searchtext {
+    width: 200px;
+    font-size: 20px;
+    background: transparent;
+    border: none;
+}
+/*사이드 메뉴*/
+.side-container {
+    display: flex;
+    min-width: 230px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 60px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    flex-direction: column;
+}
+/*사이드 메뉴 아이템*/
+.side-menu {
+    width: 100%;
+    padding: 5px;
+    font-size: 18px;
+    align-items: center;
+    border-radius: 20px;
+}
+/*사이드 메뉴 저장소*/
+.storage-viewer{
+    height: auto;
+    margin-bottom: auto;
+}
+
+.main-container {
+    background-color: #dfdfdf;
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 50px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.recent-container {
+    display: flex;
+    height: 200px;
+    margin: 20px;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #d0d0d0;
+    flex-direction: column;
+}
+.recent-file {
+    display: flex;
+    width: 110px;
+    height: 130px;
+    margin: 10px;
+    margin-top: 30px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    align-items: center;
+    flex-direction: column;
+}
+
+.recentimg {
+    margin-top: 5px;
+    width: 100px;
+    height: 100px;
+}
+.recentfont {
+    margin-top: 5px;
+    font-size: 12px;
+}
+.file-container {
+    display: grid;
+    margin: 20px;
+}
+.file {
+    align-items: center;
+    padding: 5px;
+    margin: 2px;
+    display: grid;
+    grid-template-columns: 1fr 10fr 10fr 4fr 1fr;
+}
+.file:hover{
+    background-color: #aaaaaa;
+    border-radius: 20px;
+}
+
+
+
