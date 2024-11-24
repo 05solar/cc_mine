@@ -28,7 +28,7 @@ public class FileCommandServiceImpl implements FileCommandService {
     private final FileQueryService fileQueryService;
 
     @Override
-    public Long createFile(MemberSessionDto memberSessionDto, String fileName, String realFilePath, Long folderId) {
+    public Long createFile(MemberSessionDto memberSessionDto, String fileName, Long size, String realFilePath, Long folderId) {
         Member member = memberService.getMemberEntityByUsername(memberSessionDto.getUsername());
         Folder folder = folderQueryService.getFolderEntityByIdAndCreateBy(folderId, memberSessionDto);
 
@@ -36,7 +36,7 @@ public class FileCommandServiceImpl implements FileCommandService {
             fileName = generateUniqueFileName(fileName, folder);
         }
 
-        File file = File.createFile(member, fileName, realFilePath, folder);
+        File file = File.createFile(member, fileName, realFilePath, folder, size);
 
         File savedFile = fileRepository.save(file);
 
@@ -48,6 +48,20 @@ public class FileCommandServiceImpl implements FileCommandService {
         File file = fileQueryService.getFileEntityByIdAndCreateBy(memberSessionDto, fileId);
 
         fileRepository.delete(file);
+    }
+
+    @Override
+    public void moveFile(MemberSessionDto memberSessionDto, Long fileId, Long targetFolderId) {
+        File file = fileQueryService.getFileEntityByIdAndCreateBy(memberSessionDto, fileId);
+
+        Folder targetFolder = folderQueryService.getFolderEntityByIdAndCreateBy(targetFolderId, memberSessionDto);
+
+        if (fileRepository.existsByFileNameAndFolder(file.getFileName(), targetFolder)) {
+            String uniqueFileName = generateUniqueFileName(file.getFileName(), targetFolder);
+            file.changeFileName(uniqueFileName);
+        }
+
+        file.changerFolder(targetFolder);
     }
 
     private String generateUniqueFileName(String fileName, Folder folder) {
