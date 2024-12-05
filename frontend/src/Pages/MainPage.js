@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { data, useLocation, useNavigate } from 'react-router-dom';
 import './MainPage.css'
  
   //로그인 창에서 넘어옴
@@ -10,22 +10,34 @@ import './MainPage.css'
   //초기화 시'내 저장소'로 이동하도록 함
   //페이지 새로고침 시 다시 초기화하도록 함
   //사이드 컨테이너의 내 저장소 부분을 초기화
-  //내 저장소의 구성을 확인할 수 있도록 함.
+  //storage의 구성을 확인할 수 있도록 함.
   //파일 제외, 폴더만 표시.
   //옵션 파일의 내용에 맞춰 사용자 설정 초기화(전체 뷰에 관여)
   //옵션이 변경될 경우 확인 버튼을 눌렀을 때 옵션 파일의 내용을 수정하고, 업데이트하는 형식
 
 
 function MainPage() {
-
   //페이지 이동, 이전 페이지의 데이터 가져오기
   const navigate = useNavigate();  
   const location = useLocation();
-  const {userInfo, storageInfo, options} = location.state || {};
-  const [files, setFiles] = useState(storageInfo || []);
+  const {userInfo, options} = location.state || {};
+  const [currentPath, setCurrentPath] = useState("/storage");
 
-  //현재 위치 관리
-  const [currentPath, setCurrnetPath] = useState( "/내 저장소");
+  useEffect(() => {
+    updatePath("/storage");
+  },[]);
+  const [files, setFiles] = useState([]);
+
+  const updatePath = async (path) => {
+    console.log(`${path}`);
+    const response = await fetch(`${path}.json`);
+    if(!response.ok) {
+       throw new Error('http error');
+      }
+      const data = await response.json();
+      setFiles(data);
+      setCurrentPath(path);
+    }
 
   //드롭다운 관리 ------------------------------------------------------------------
   //유저 드롭다운
@@ -36,39 +48,14 @@ function MainPage() {
   }
 
   //폴더 현황 드롭다운
-  const [expandedFolders, setExpandedFolders] = useState({}); // 폴더 열림 상태 관리
-  const toggleFolder = (currentPath) => {// 폴더 열림/닫힘 토글
-    setExpandedFolders((prevState) => ({
-      ...prevState,
-      [currentPath]: !prevState[currentPath], // 현재 경로의 열림 상태를 토글
-    }));
-  };
-  const renderFolders = (folderList, parentPath = "") => { // 폴더 계층 구조 렌더링
+  const [openStorage, setOpenStorage] = useState({});
+  const storageDropdown = (folderList, path = "/storage") => {
     return folderList.map((item) => {
-      if (item.type === "folder") {
-        const currentPath = `${parentPath}/${item.name}`;
-        return (
-          <div key={currentPath} className="folder-item">
-            <button className="storage-item" onClick={() => toggleFolder(currentPath)}>
-              <img
-                src={`image/${expandedFolders[currentPath] ? "fold" : "spread"}.png`}
-                alt="folder-icon"
-                className="sideimg"
-              />
-              {item.name}
-            </button>
-            {expandedFolders[currentPath] && item.children && (
-              <div className="nested-folders">
-                {renderFolders(item.children, currentPath)}
-              </div>
-            )}
-          </div>
-        );
+      if (item.type === "folder"){
+        
       }
-      return null; // 폴더가 아닌 파일은 사이드 메뉴에서 표시하지 않음
     });
-  };
-
+  }
   //팝업창 관리 --------------------------------------------------------------------
   //새 폴더 팝업
   const [isFolderPopupOpen, setFolderPopupOpen] = useState(false);
@@ -169,16 +156,16 @@ function MainPage() {
   };
   const handleDoubleClick = (file) => { // 더블 클릭 이벤트
     if (file.type === "folder") {
-    setCurrnetPath(`${currentPath}/${file.name}`);
+      updatePath(`${currentPath}/${file.name}`);
     } else {
       // 파일인 경우 미리보기 표시
       setPreviewFile(file);
     }
   };
   const handleGoBack = () => {
-    if(currentPath !== "/내 저장소"){
-      const parentPath = currentPath.split("/").slice(0,-1).join("/") || "/내 저장소";
-      setCurrnetPath(parentPath);
+    if(currentPath !== "/storage"){
+      const parentPath = currentPath.split("/").slice(0,-1).join("/") || "/storage";
+      updatePath(parentPath);
     }
   }
   //메인 페이지 --------------------------------------------------------------------
@@ -187,11 +174,11 @@ function MainPage() {
         {/* 헤더 */}
         <header>
           <button className="logobtn">
-            <img src="image/logo.png" className="logoimg"/>
+            <img src="image/logo.png" className="logoimg" alt="logo"/>
             <h className="logofont">CLOUDBOX</h>
           </button>        
           <div className="searchbar">
-            <img src="image/search.png" className="searchimg" />
+            <img src="image/search.png" className="searchimg" alt="search"/>
             <input className="searchtext" placeholder="검색"></input>
           </div>
           <>
@@ -199,7 +186,7 @@ function MainPage() {
             {isDropdownView && <button className="userbtn" onClick={() => navigate('/')}>로그아웃</button>}
             <button className="userbtn" onClick={viewDropdown}>
               <img src={userInfo?.profileImage} onError={(e) => {e.target.onerror = null; 
-                e.target.src = "image/user.png"}} className="headerimg"/> 
+                e.target.src = "image/user.png"}} className="headerimg" alt="user"/> 
               <h>{userInfo?.name}</h>
             </button>
           </>
@@ -209,10 +196,10 @@ function MainPage() {
           {/* 사이드 메뉴 시작 */}
           <div className="side-container">
             <button className="side-menu" onClick={openFolderPopup}>
-              <img src="image/add-folder.png" className="sideimg" />새 폴더
+              <img src="image/add-folder.png" className="sideimg" alt="folder"/>새 폴더
             </button>
             <button className="side-menu">
-              <img src="image/file-upload.png" className="sideimg" />
+              <img src="image/file-upload.png" className="sideimg" alt="file"/>
               <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
                 파일 업로드
               </label>
@@ -225,21 +212,16 @@ function MainPage() {
               />
             </button>
             <div className="storage-viewer">
-              <button className="storage-item" onClick={() => toggleFolder("/내 저장소")}>
-                <img src={`image/${expandedFolders["/내 저장소"] ? "fold" : "spread"}.png`}  className="sideimg" />
+              <button className="storage-item">
+                <img src={`image/spread.png`}  className="sideimg" alt="spread"/>
                 <h >내 저장소</h>                 
               </button>
-              {expandedFolders["/내 저장소"] && (
-                <div className="nested-folders">
-                  {renderFolders(files, "/내 저장소")}
-                </div>
-              )}
             </div>
             <button className="side-menu" >
-              <img src="image/trash.png" className="sideimg" />휴지통
+              <img src="image/trash.png" className="sideimg" alt="bin"/>휴지통
             </button>
             <button className="side-menu" onClick={openSettingPopup}>
-              <img src="image/setting.png" className="sideimg" />설정
+              <img src="image/setting.png" className="sideimg" alt="setting"/>설정
             </button>
           </div>
           {/* 사이드 메뉴 끝 메인 컨테이너 시작*/}
@@ -269,7 +251,7 @@ function MainPage() {
                   </tr>
                 </thead>
                 <tbody>
-                {currentPath !== "/내 저장소" && (
+                {currentPath !== "/storage" && (
                   <tr>
                   <td onDoubleClick={handleGoBack} className="back-btn" colSpan='6'>
                     /..
