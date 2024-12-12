@@ -106,7 +106,7 @@ const LoginPage = () => {
                 비밀번호를 잊으셨나요?
             </a>
 
-            {/* 구분선 */}
+            {/* 구분선   */}
             <div className="separator">소셜미디어 로그인</div>
 
             {/* 소셜 로그인 버튼 */}

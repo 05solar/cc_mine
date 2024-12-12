@@ -62,7 +62,7 @@ const RegisterPage = () => {
                     required
                 />
 
-                {/* 이메일 입력 */}
+                {/* 이메일 입력   */}
                 <label htmlFor="email">이메일</label>
                 <input
                     type="email"
