@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import './RegisterPage.css'; // CSS 파일을 분리하여 관리
+import './RegisterPage.css'; 
 
 const RegisterPage = () => {
     const navigate = useNavigate();
