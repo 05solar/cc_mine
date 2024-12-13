@@ -25,12 +25,21 @@ const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/sign-up`, {
-                username: formData.username,
-                email: formData.email,
-                password: formData.password,
-                confirmPassword: formData.confirmPassword
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/sign-up`,
+                {
+                    username: formData.username,
+                    email: formData.email,
+                    password: formData.password,
+                    confirmPassword: formData.confirmPassword
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                }
+            );
 
             if (response.status === 201) {
                 setMessage('회원가입이 성공적으로 완료되었습니다! 로그인 페이지로 이동합니다.');
@@ -113,4 +122,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-

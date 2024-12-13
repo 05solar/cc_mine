@@ -23,10 +23,19 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
-                username: formData.username,
-                password: formData.password
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/login`,
+                {
+                    username: formData.username,
+                    password: formData.password
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                }
+            );
 
             if (response.status === 200) {
                 setMessage('로그인 성공! 메인 페이지로 이동합니다.');
@@ -123,4 +132,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
