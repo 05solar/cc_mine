@@ -22,11 +22,99 @@ function MainPage() {
   const location = useLocation();
   const {userInfo, options} = location.state || {};
   const [currentPath, setCurrentPath] = useState("/storage");
+  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState([]);
+
+ 
+  const uploadFile = async (file, folderId) => {
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    try {
+      const response = await fetch(`/api/file?folderId=${folderId}`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) throw new Error("파일 업로드 실패");
+      const result = await response.json();
+      alert("파일이 업로드되었습니다.");
+      fetchFiles(folderId); // 파일 목록 갱신
+    } catch (error) {
+      console.error(error.message);
+      alert("파일 업로드 중 오류가 발생했습니다.");
+    }
+  };
+  
+  const downloadFile = async (fileId, fileName) => {
+    try {
+      const response = await fetch(`/api/file/${fileId}`);
+      if (!response.ok) throw new Error("파일 다운로드 실패");
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error.message);
+      alert("파일 다운로드 중 오류가 발생했습니다.");
+    }
+  };
+
+  
+  const createFolder = async (name, parentFolderId) => {
+    try {
+      const response = await fetch(`/api/folders/${parentFolderId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (!response.ok) throw new Error("폴더 생성 실패");
+      const result = await response.json();
+      alert("폴더가 생성되었습니다.");
+      fetchFiles(parentFolderId); // 파일 목록 갱신
+    } catch (error) {
+      console.error(error.message);
+      alert("폴더 생성 중 오류가 발생했습니다.");
+    }
+  };
+
+  const moveResource = async (resourceId, targetResourceId, resourceType) => {
+    try {
+      const response = await fetch("/api/resources/move", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resourceId, targetResourceId, resourceType }),
+      });
+      if (!response.ok) throw new Error("리소스 이동 실패");
+      alert("리소스가 성공적으로 이동되었습니다.");
+      fetchFiles(currentPath); // 파일 목록 갱신
+    } catch (error) {
+      console.error(error.message);
+      alert("리소스 이동 중 오류가 발생했습니다.");
+    }
+  };
+
+  const fetchFiles = async (folderId = "root") => {
+    try {
+      const response = await fetch(`/api/main?folderId=${folderId}`);
+      if (!response.ok) throw new Error("파일 목록 조회 실패");
+      const result = await response.json();
+      setFiles(result.data.files);
+      setFolders(result.data.folders);
+    } catch (error) {
+      console.error(error.message);
+      alert("파일 목록을 불러오는 중 오류가 발생했습니다.");
+    }
+  };
+
+  
 
   useEffect(() => {
     updatePath("/storage");
   },[]);
-  const [files, setFiles] = useState([]);
 
   const updatePath = async (path) => {
     console.log(`${path}`);
